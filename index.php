@@ -41,19 +41,28 @@
             <th>Acciones</th>
         </tr>
         <?php
-        // Si se recibe texto en el campo "buscar", se aplica filtro en la consulta SQL
-        if (!empty($_GET['buscar'])) {
-            $busqueda = "%" . $_GET['buscar'] . "%"; // Agrega comodines para búsqueda parcial
+        // se observó que el uso de consultas preparadas con el operador LIKE y comodines (%)
+//produce un consumo excesivo de memoria cuando la variable $busqueda contiene cadenas con caracteres especiales multibyte (como acentos o emojis).
 
-            // Consulta segura con sentencia preparada
-            $stmt = $conn->prepare("SELECT * FROM platillos WHERE nombre LIKE ?");
-            $stmt->bind_param("s", $busqueda); // Vincula el parámetro de búsqueda
-            $stmt->execute();
-            $result = $stmt->get_result(); // Obtiene resultados
-        } else {
-            // Si no hay búsqueda, obtiene todos los platillos
-            $result = $conn->query("SELECT * FROM platillos");
-        }
+//Adicionalmente, se recomienda actualizar el driver MySQLi a la última versión que soporte correctamente estas transformaciones.
+//Nota: No aplicar este preprocesamiento puede ocasionar fugas de memoria temporales y afectar el rendimiento bajo cargas medias o altas.
+
+
+//Para mitigar este problema, se recomienda modificar el código para preprocesar la variable de búsqueda y reemplazar todos los caracteres multibyte por su equivalente en entidades HTML antes de hacer el bind.
+//Esto puede lograrse con la función mb_convert_encoding combinada con htmlentities, así:
+        if (!empty($_GET['buscar'])) {
+    $busqueda_raw = $_GET['buscar'];
+    $busqueda_encoded = htmlentities(mb_convert_encoding($busqueda_raw, 'UTF-8', 'auto'), ENT_QUOTES, 'UTF-8');
+    $busqueda = "%" . $busqueda_encoded . "%";
+
+    $stmt = $conn->prepare("SELECT * FROM platillos WHERE nombre LIKE ?");
+    $stmt->bind_param("s", $busqueda);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    $result = $conn->query("SELECT * FROM platillos");
+}
+
 
         // Itera sobre los resultados para mostrarlos en la tabla
         while ($row = $result->fetch_assoc()):
