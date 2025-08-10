@@ -12,9 +12,10 @@
 <body>
     <h1>Menú del Restaurante de Mariscos</h1>
       <!-- Enlace para cerrar sesión -->
-    <p> | <button class="boton boton Secundario">.
-    <a href="cierredesecion2.php">Cerrar sesión hacer clic aqui</a></p>
-</button>
+    <!-- Estás metiendo un <a> dentro de un <button>, lo cual no es válido según HTML5 -->
+    <!-- Lo ideal sería usar solo un <a> estilizado como botón -->
+    <a class="boton boton-secundario" href="cierredesecion2.php">Cerrar sesión</a>
+
     <button class="boton boton Secundario">.
     <a href="paginainicial.php">Volver a esta misma pagina</a>
 </button>
